@@ -1,0 +1,8 @@
+NAME                   IMAGE                                      COMMAND                   SERVICE              CREATED         STATUS                     PORTS
+lakehouse-minio        pgsty/minio:RELEASE.2026-08-04T00-00-00Z   "/usr/bin/docker-ent…"    minio                4 minutes ago   Up 4 minutes               0.0.0.0:9000-9001->9000-9001/tcp, [::]:9000-9001->9000-9001/tcp
+lakehouse-minio-init   pgsty/mc:RELEASE.2026-09-16T00-00-00Z      "/bin/sh -c 'until m…"    minio-init           4 minutes ago   Exited (0) 4 minutes ago   
+lakehouse-pg           postgres:17                                "docker-entrypoint.s…"    postgres             4 minutes ago   Up 4 minutes (healthy)     0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+lakekeeper             quay.io/lakekeeper/catalog:latest          "/home/nonroot/lakek…"    lakekeeper           4 minutes ago   Up 4 minutes (healthy)     0.0.0.0:8181->8181/tcp, [::]:8181->8181/tcp
+lakekeeper-init        curlimages/curl:8.11.1                     "/bin/sh -c 'echo \"b…"   lakekeeper-init      4 minutes ago   Exited (0) 4 minutes ago   
+lakekeeper-migrate     quay.io/lakekeeper/catalog:latest          "/home/nonroot/lakek…"    lakekeeper-migrate   4 minutes ago   Exited (0) 4 minutes ago   
+trino                  trinodb/trino:476                          "/usr/lib/trino/bin/…"    trino                4 minutes ago   Up 4 minutes (healthy)     0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp

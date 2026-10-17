@@ -1,0 +1,20 @@
+{
+  "partitioned": {
+    "files": 14,
+    "size_mb": 21.978,
+    "elapsed_s": 0.351,
+    "input_rows": 114705,
+    "input_size": "1.97MB",
+    "physical_input": "1.70MB",
+    "splits": 1
+  },
+  "no_partitions": {
+    "files": 1,
+    "size_mb": 20.715,
+    "elapsed_s": 0.713,
+    "input_rows": 1478870,
+    "input_size": "17.62MB",
+    "physical_input": "10.47MB",
+    "splits": 1
+  }
+}

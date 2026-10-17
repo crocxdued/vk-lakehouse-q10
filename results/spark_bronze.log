@@ -1,0 +1,46 @@
+> SHOW NAMESPACES IN bronze
+  lakehouse
+  bench_parquet_none
+  bench_parquet_gzip
+  bench_parquet_zstd
+  bench_parquet_none_small
+
+> SHOW TABLES IN bronze.lakehouse
+  lakehouse | customer | False
+  lakehouse | orders | False
+  lakehouse | lineitem | False
+  lakehouse | nation | False
+  lakehouse | region | False
+
+> DESCRIBE bronze.lakehouse.lineitem (первые 6 колонок)
+  orderkey | bigint | None
+  partkey | bigint | None
+  suppkey | bigint | None
+  linenumber | int | None
+  quantity | double | None
+  extendedprice | double | None
+
+> count(*) по таблицам Bronze
+  customer | 150000
+  orders | 1500000
+  lineitem | 6001215
+  nation | 25
+  region | 5
+
+> SELECT returnflag, count(*) AS lines, round(sum(extendedprice * (1 - discount)), 2) AS revenue FROM bronze.lakehouse.lineitem GROUP BY returnflag ORDER BY returnflag   -- 1.307 s
+  A | 1478493 | 53758257134.87
+  N | 3043852 | 110602674065.52
+  R | 1478870 | 53741292684.6
+
+> Снапшоты bronze.lakehouse.lineitem (метатаблица Iceberg .snapshots)
+  714581824463356886 | 2026-10-17 17:52:24.303000 | append
+
+> Файлы bronze.lakehouse.lineitem (метатаблица .files)
+  4 | 146.16 | PARQUET
+
+> Gold, прочитанный Spark (сверка с Trino)
+  1 | 57040 | 734235.25
+  2 | 143347 | 721002.69
+  3 | 60838 | 679127.31
+  4 | 101998 | 637029.57
+  5 | 125341 | 633508.09

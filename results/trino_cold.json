@@ -1,0 +1,35 @@
+{
+  "schema": "bench_parquet_none",
+  "runs": [
+    {
+      "query_id": "20261017_180240_00001_rsk5m",
+      "wall_s": 3.662,
+      "elapsed_s": 3.61,
+      "physical_input_mb": 131.54,
+      "processed_rows": 7823039,
+      "peak_memory_mb": 6.9,
+      "planning_ms": 715,
+      "analysis_ms": 539
+    },
+    {
+      "query_id": "20261017_180244_00003_rsk5m",
+      "wall_s": 1.761,
+      "elapsed_s": 1.746,
+      "physical_input_mb": 131.54,
+      "processed_rows": 7823039,
+      "peak_memory_mb": 10.9,
+      "planning_ms": 176,
+      "analysis_ms": 112
+    },
+    {
+      "query_id": "20261017_180246_00005_rsk5m",
+      "wall_s": 1.144,
+      "elapsed_s": 1.135,
+      "physical_input_mb": 131.54,
+      "processed_rows": 7823039,
+      "peak_memory_mb": 10.9,
+      "planning_ms": 141,
+      "analysis_ms": 67
+    }
+  ]
+}

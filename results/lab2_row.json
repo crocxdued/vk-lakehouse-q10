@@ -1,0 +1,10 @@
+{
+  "size_gb": 0.3495,
+  "files": 4,
+  "write_s": 76.432,
+  "agg_first": 3.61,
+  "agg_next": 5.96,
+  "sf": "sf1",
+  "trino": "3.61 / 5.96",
+  "spark": "5.52 / 1.38"
+}

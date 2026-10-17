@@ -1,0 +1,66 @@
+{
+  "startup_s": 2.26,
+  "results": [
+    {
+      "format": "PARQUET",
+      "codec": "NONE",
+      "schema": "bench_parquet_none",
+      "runs": [
+        5.523,
+        1.496,
+        1.255
+      ],
+      "first_s": 5.523,
+      "next_median_s": 1.375,
+      "top1": [
+        "57040",
+        "Customer#000057040",
+        "734235.2455"
+      ]
+    },
+    {
+      "format": "PARQUET",
+      "codec": "GZIP",
+      "schema": "bench_parquet_gzip",
+      "runs": [
+        1.668,
+        1.082,
+        1.233
+      ],
+      "first_s": 1.668,
+      "next_median_s": 1.158,
+      "top1": [
+        "57040",
+        "Customer#000057040",
+        "734235.2455"
+      ]
+    },
+    {
+      "format": "PARQUET",
+      "codec": "ZSTD",
+      "schema": "bench_parquet_zstd",
+      "runs": [
+        1.465,
+        0.941,
+        1.291
+      ],
+      "first_s": 1.465,
+      "next_median_s": 1.116,
+      "top1": [
+        "57040",
+        "Customer#000057040",
+        "734235.2455"
+      ]
+    }
+  ],
+  "cache": {
+    "schema": "bench_parquet_none",
+    "fill_s": 5.42,
+    "runs": [
+      1.937,
+      1.207,
+      1.195
+    ],
+    "median_s": 1.207
+  }
+}

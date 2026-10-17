@@ -1,0 +1,95 @@
+{
+  "columns_before": [
+    "custkey",
+    "name",
+    "address",
+    "phone",
+    "acctbal",
+    "mktsegment",
+    "comment",
+    "nation",
+    "region"
+  ],
+  "snapshots_before": [
+    [
+      8412172435858429572,
+      "2026-10-17 17:52:31.646 UTC",
+      "append"
+    ]
+  ],
+  "after_add": {
+    "total": 150000,
+    "filled": 0
+  },
+  "snapshots_after_add": 1,
+  "tiers": [
+    [
+      "DEBTOR",
+      13692
+    ],
+    [
+      "HIGH",
+      67989
+    ],
+    [
+      "REGULAR",
+      68319
+    ]
+  ],
+  "snapshots_after_update": 2,
+  "columns_after_rename": [
+    "custkey",
+    "name",
+    "address",
+    "phone_number",
+    "acctbal",
+    "mktsegment",
+    "comment",
+    "nation",
+    "region",
+    "customer_tier"
+  ],
+  "sample_after_rename": [
+    [
+      1,
+      "25-989-741-2988"
+    ],
+    [
+      2,
+      "23-768-687-3665"
+    ],
+    [
+      3,
+      "11-719-748-3364"
+    ]
+  ],
+  "snapshots_after_rename": 2,
+  "s0": 6194548103525278235,
+  "europe_before": 30197,
+  "europe_after_delete": 0,
+  "europe_time_travel": 30197,
+  "europe_restored": 30197,
+  "total_restored": 150000,
+  "snapshots_final": [
+    [
+      8412172435858429572,
+      "2026-10-17 17:52:31.646 UTC",
+      "append"
+    ],
+    [
+      6194548103525278235,
+      "2026-10-17 17:53:25.134 UTC",
+      "overwrite"
+    ],
+    [
+      4054182545893551261,
+      "2026-10-17 17:53:27.307 UTC",
+      "delete"
+    ],
+    [
+      3017067792315389568,
+      "2026-10-17 17:53:28.286 UTC",
+      "append"
+    ]
+  ]
+}

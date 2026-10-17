@@ -1,0 +1,142 @@
+# Локальный Lakehouse по гайдам 1–2: MinIO -> Lakekeeper (Iceberg REST) -> Trino
+# + Spark (инструмент п. 6.2 и второй движок для бенчмарка лабы 2).
+# Медальон: 3 бакета (bronze/silver/gold) -> 3 warehouse -> 3 каталога Trino.
+# Запуск: ./run.sh up   (или docker compose up -d)
+name: lakehouse
+
+x-lakekeeper-env: &lakekeeper_env
+  LAKEKEEPER__PG_ENCRYPTION_KEY: "local-lab-key-NOT-secure"
+  LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://postgres:postgres@postgres:5432/postgres
+  LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://postgres:postgres@postgres:5432/postgres
+
+services:
+  # --- Объектное хранилище (S3). Официальный образ MinIO больше не публикуется
+  #     (quay.io отвечает 401), поэтому используется S3-совместимый форк pgsty/minio.
+  minio:
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    container_name: lakehouse-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio12345
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # веб-консоль
+    volumes:
+      - minio-data:/data
+
+  # Одноразовый: ждёт MinIO и создаёт три бакета — по одному на слой медальона
+  minio-init:
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
+    container_name: lakehouse-minio-init
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until mc alias set local http://minio:9000 minio minio12345; do sleep 2; done
+        for b in bronze silver gold; do mc mb --ignore-existing local/$$b; done
+        mc ls local
+    depends_on:
+      - minio
+
+  # --- PostgreSQL: метаданные каталога Lakekeeper ---
+  postgres:
+    image: postgres:17
+    container_name: lakehouse-pg
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # --- Lakekeeper: миграции схемы каталога (отрабатывает и завершается) ---
+  lakekeeper-migrate:
+    image: quay.io/lakekeeper/catalog:latest
+    container_name: lakekeeper-migrate
+    restart: "no"
+    environment: *lakekeeper_env
+    command: ["migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # --- Lakekeeper: Iceberg REST Catalog + UI (http://localhost:8181/ui) ---
+  lakekeeper:
+    image: quay.io/lakekeeper/catalog:latest
+    container_name: lakekeeper
+    environment: *lakekeeper_env
+    command: ["serve"]
+    ports:
+      - "8181:8181"
+    healthcheck:
+      test: ["CMD", "/home/nonroot/lakekeeper", "healthcheck"]
+      interval: 2s
+      timeout: 10s
+      retries: 30
+      start_period: 5s
+    depends_on:
+      lakekeeper-migrate:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+
+  # --- Одноразовый: принять Terms of Use и зарегистрировать warehouse bronze/silver/gold ---
+  lakekeeper-init:
+    image: curlimages/curl:8.11.1
+    container_name: lakekeeper-init
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "bootstrap:"
+        curl -s -X POST http://lakekeeper:8181/management/v1/bootstrap \
+          -H 'Content-Type: application/json' -d '{"accept-terms-of-use": true}'
+        for w in bronze silver gold; do
+          echo; echo "warehouse $$w:"
+          curl -s -X POST http://lakekeeper:8181/management/v1/warehouse \
+            -H 'Content-Type: application/json' -d @/init/warehouse-$$w.json
+        done
+        echo
+    volumes:
+      - ./lakekeeper:/init:ro
+    depends_on:
+      lakekeeper:
+        condition: service_healthy
+
+  # --- Trino: SQL-движок. Каталоги bronze/silver/gold/tpch — из папки trino/catalog ---
+  trino:
+    image: trinodb/trino:476
+    container_name: trino
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./trino/catalog:/etc/trino/catalog:ro
+      - ./sql:/sql:ro
+    depends_on:
+      lakekeeper-init:
+        condition: service_completed_successfully
+
+  # --- Инструменты: Python-оркестратор замеров + PySpark 3.5 с Iceberg.
+  #     Не стартует с `up`, запускается командами ./run.sh (docker compose run --rm tools ...)
+  tools:
+    profiles: ["tools"]
+    build: ./tools
+    image: lakehouse-tools:local
+    env_file: .env
+    environment:
+      WORK: /work
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio12345
+    volumes:
+      - ./:/work
+
+volumes:
+  minio-data:
+  pg-data:
